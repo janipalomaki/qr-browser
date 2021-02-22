@@ -1,15 +1,90 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Button } from 'react-native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
+import { WebView } from 'react-native-webview';
+
+// React Native Paper
+import { FAB, Provider as PaperProvider, Appbar } from 'react-native-paper';
 
 export default function App() {
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+
+  const [uri, setUri] = useState("");
+  const [openWebsite, setOpenWebsite] = useState(false);
+
+  useEffect(() => {
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+   
+    if (data.includes("https://") === true || data.includes("http://") === true){
+      setScanned(true);
+      setUri(data);
+      setHasPermission(null);
+      setOpenWebsite(true);
+
+    } else {
+      setScanned(false);
+      setHasPermission(null);
+      alert("Skannausta ei voitu suorittaa! QR-koodissa saattaa olla virhe. Yritä uudelleen");
+    }
+    
+  };
+
+  const kaynnistaSkannaustila = async () => {
+    const { status } = await BarCodeScanner.requestPermissionsAsync();
+    setHasPermission(status === 'granted');
+  }
+
+
+  if (hasPermission === null) {
+    return (
+      <PaperProvider>
+
+        <Appbar.Header
+        style={styles.appbar}
+        >
+          <FAB
+          style={styles.iconScan}
+          icon="qrcode-scan"
+          onPress={kaynnistaSkannaustila}
+          />
+          <FAB
+          style={styles.iconScan}
+          icon="piggy-bank"
+          onPress={kaynnistaSkannaustila}
+          />
+        </Appbar.Header>
+      
+
+      {(openWebsite === true) // Näytetään QR-koodin lataaman url:n verkkosivu
+        ?<WebView source={{ uri: uri }} style={{ marginTop: 20 }} />
+        : null
+      }
+     
+      </PaperProvider>
+    )
+  }
+
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+  // Bar code scanner
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+
+     
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -17,5 +92,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  appbar : {
+    marginTop: 50
+  },
+  iconScan : {
+    marginLeft : 20,
+    marginBottom : 30,
+    padding : 2
   },
 });
