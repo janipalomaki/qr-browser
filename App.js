@@ -1,104 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import { WebView } from 'react-native-webview';
+import React, { } from 'react';
 
-// React Native Paper
-import { FAB, Provider as PaperProvider, Appbar } from 'react-native-paper';
+// Omat komponentit
+import Koti from "./src/components/Koti";
+import Koodinlukija from "./src/components/Koodinlukija";
+import EtsiAutomaatti from "./src/components/EtsiAutomaatti";
+
+
+// React Native stack navigator
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+const Stack = createStackNavigator();
 
 export default function App() {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
 
-  const [uri, setUri] = useState("");
-  const [openWebsite, setOpenWebsite] = useState(false);
-
-  useEffect(() => {
-  }, []);
-
-  const handleBarCodeScanned = ({ type, data }) => {
-   
-    if (data.includes("https://") === true || data.includes("http://") === true){
-      setScanned(true);
-      setUri(data);
-      setHasPermission(null);
-      setOpenWebsite(true);
-
-    } else {
-      setScanned(false);
-      setHasPermission(null);
-      alert("Skannausta ei voitu suorittaa! QR-koodissa saattaa olla virhe. Yritä uudelleen");
-    }
-    
-  };
-
-  const kaynnistaSkannaustila = async () => {
-    const { status } = await BarCodeScanner.requestPermissionsAsync();
-    setHasPermission(status === 'granted');
-  }
-
-
-  if (hasPermission === null) {
-    return (
-      <PaperProvider>
-
-        <Appbar.Header
-        style={styles.appbar}
-        >
-          <FAB
-          style={styles.iconScan}
-          icon="qrcode-scan"
-          onPress={kaynnistaSkannaustila}
-          />
-          <FAB
-          style={styles.iconScan}
-          icon="piggy-bank"
-          onPress={kaynnistaSkannaustila}
-          />
-        </Appbar.Header>
-      
-
-      {(openWebsite === true) // Näytetään QR-koodin lataaman url:n verkkosivu
-        ?<WebView source={{ uri: uri }} style={{ marginTop: 20 }} />
-        : null
-      }
-     
-      </PaperProvider>
-    )
-  }
-
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
-
-  // Bar code scanner
   return (
-    <View style={styles.container}>
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
-      />
-      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
-
-     
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Koti">
+        <Stack.Screen name="Koti" component={Koti} />
+        <Stack.Screen name="Koodinlukija" component={Koodinlukija} />
+        <Stack.Screen name="EtsiAutomaatti" component={EtsiAutomaatti} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  appbar : {
-    marginTop: 50
-  },
-  iconScan : {
-    marginLeft : 20,
-    marginBottom : 30,
-    padding : 2
-  },
-});
