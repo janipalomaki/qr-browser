@@ -11,7 +11,7 @@ export default function Koti( { navigation } ) {
 
        <FAB
        style={styles.icon}
-       label="Lue QR-koodi"
+       label="QR-koodinlukija"
        icon="qrcode-scan"
        title="Koodinlukija"
        onPress={ () => navigation.navigate('Koodinlukija')} 
@@ -19,10 +19,10 @@ export default function Koti( { navigation } ) {
        
        <FAB
         style={styles.icon}
-       label="Etsi lähin Otto automaatti"
+       label="Otto-automaatin paikannus"
        icon="piggy-bank"
        title="EtsiAutomaatti"
-       onPress={ () => navigation.navigate('EtsiAutomaatti')} 
+       onPress={ () => navigation.navigate('Automaattipaikannin')} 
        />
      
       </PaperProvider>

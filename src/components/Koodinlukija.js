@@ -44,6 +44,7 @@ export default function Koodinlukija() {
 
       
           <FAB
+          label="Lue QR-koodi"
           style={styles.iconScan}
           icon="qrcode-scan"
           onPress={kaynnistaSkannaustila}
