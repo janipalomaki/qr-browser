@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet} from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { WebView } from 'react-native-webview';
 
 // React Native Paper
-import { FAB, Provider as PaperProvider, Appbar } from 'react-native-paper';
+import { FAB, Provider as PaperProvider} from 'react-native-paper';
 
 export default function Koodinlukija() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -18,6 +18,7 @@ export default function Koodinlukija() {
 
   const handleBarCodeScanned = ({ type, data }) => {
    
+    // Tarkistetaan QR-koodiin koodattu verkko-osoite
     if (data.includes("https://") === true || data.includes("http://") === true){
       setScanned(true);
       setUri(data);

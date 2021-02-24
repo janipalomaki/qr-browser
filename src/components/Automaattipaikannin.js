@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 // React Native Paper
-import { FAB, Provider as PaperProvider, Card, Paragraph, Title } from 'react-native-paper';
+import { FAB, Card, Paragraph, Title, Text } from 'react-native-paper';
 
 // Json
 import data from "./data.json";
@@ -10,14 +10,15 @@ import data from "./data.json";
 // Paikannus
 import * as Location from 'expo-location';
 
-// Etäisyyden laskenta (En saanut omia laskureita toimimaan oikein)
+// Etäisyyden laskenta 
+//(En saanut omia laskureita toimimaan oikein, joten käytin laskentaan lisäosaa. Eroa tuli useita kilometrejä...)
 import { getDistance } from 'geolib';
 
 export default function Automaattipaikannin() {
 
   // Oman sijainnin paikannuksen tilamuuttujat
   const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
 
@@ -48,6 +49,7 @@ export default function Automaattipaikannin() {
           { latitude: x1, longitude: y1 },
           { latitude: x2, longitude: y2 }
         );
+
         let km = m / 1000;
         let tulos = km.toFixed(1);
 
@@ -82,7 +84,7 @@ export default function Automaattipaikannin() {
     (async () => {
       let { status } = await Location.requestPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+        setErrorMsg('Sovellukselle ei ole annettu lupaa hakea sijaintia! Tarkista asetukset ja yritä uudelleen.');
         return;
       }
 
@@ -127,7 +129,7 @@ export default function Automaattipaikannin() {
             )
         }
       })
-      : null
+      : <Text>{errorMsg}</Text>
       }
 
     </View>
