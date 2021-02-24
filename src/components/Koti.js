@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 
 // React Native Paper
-import { FAB, Provider as PaperProvider, Appbar } from 'react-native-paper';
+import { FAB, Provider as PaperProvider } from 'react-native-paper';
 
 export default function Koti( { navigation } ) {
   
