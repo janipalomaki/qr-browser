@@ -41,17 +41,14 @@ export default function Koodinlukija() {
   if (hasPermission === null) {
     return (
       <PaperProvider>
-
       
           <FAB
           label="Lue QR-koodi"
-          style={styles.iconScan}
+          style={styles.icon}
           icon="qrcode-scan"
           onPress={kaynnistaSkannaustila}
           />
-   
-      
-
+  
       {(openWebsite === true) // Näytetään QR-koodin lataaman url:n verkkosivu
         ?<WebView source={{ uri: uri }} style={{ marginTop: 20 }} />
         : null
@@ -72,13 +69,10 @@ export default function Koodinlukija() {
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
-      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
-
-     
+      {scanned && setScanned(false) }
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -90,9 +84,11 @@ const styles = StyleSheet.create({
   appbar : {
     marginTop: 50
   },
-  iconScan : {
+  icon : {
     marginLeft : 20,
     marginBottom : 30,
-    padding : 2
+    padding : 10,
+    marginTop : 50,
+    margin : 20
   },
 });

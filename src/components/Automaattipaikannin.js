@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 
 // React Native Paper
-import { FAB, Provider as PaperProvider, Appbar } from 'react-native-paper';
+import { FAB, Provider as PaperProvider, Card, Paragraph, Title } from 'react-native-paper';
 
 // Json
 import data from "./data.json";
@@ -23,8 +23,8 @@ export default function Automaattipaikannin() {
 
   // Automaatit
   const [automaatit, setAutomaatit] = useState([]);
-
-  const [etaisyys, setEtaisyys] = useState(null);
+  const [etaisyydet, setEtaisyydet] = useState([]);
+  const [lahinAutomaatti, setLahinAutomaatti] = useState(null);
 
   // Napin disablointi
   const [disablointi, setDisablointi] = useState(true);
@@ -32,6 +32,7 @@ export default function Automaattipaikannin() {
   const laskeEtaisyys = () => {
 
     let automaatitArray = [];
+    let etaisyydetArray = [];
 
     let x1 = Number(latitude);
     let y1 = Number(longitude);
@@ -58,15 +59,23 @@ export default function Automaattipaikannin() {
             "postitoimipaikka" : data[idx].postitoimipaikka
         };
 
+
         automaatitArray.push(automaattiObjekti);
+        etaisyydetArray.push(tulos);
          
     })
     // Luodaan automaatit tietorakenne, missä mukana etäisyys
     setAutomaatit(automaatitArray);
+    setEtaisyydet(etaisyydetArray);
   } 
 
+  const etsiLahinAutomaatti = () => {
 
-  // PIENIN ETÄISYYS ETSITTÄVÄ
+    // Sortataan pienin arvo ensimmäiseksi
+    let lahin = etaisyydet.sort(function(a, b){return a - b});
+    setLahinAutomaatti(lahin[0]); // ensimmäinen eli pienin arvo
+  
+  }
 
   // Pyydetään lupaa hakea sijainti heti kun sovellus avataan
   useEffect(() => {
@@ -82,38 +91,42 @@ export default function Automaattipaikannin() {
       setLocation(location);
       setLatitude(location.coords.latitude);
       setLongitude(location.coords.longitude);
+      laskeEtaisyys();
       setDisablointi(false);
 
     })();
-  }, [etaisyys]);
-
-
-  let text = 'Waiting..';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-   
-    text = JSON.stringify(location);
-  }
+  }, [etaisyydet]);
 
   return (
-    <View >
-      <Text>Oma sijaintisi tällä hetkellä:</Text>
-      <Text>LAT: {latitude} </Text>
-      <Text>LON: {longitude} </Text>
-      
-
+    <View style={styles.container} >
       <FAB
           label="Paikanna lähin Otto-automaatti"
+          style={styles.icon}
           disabled={disablointi}
           onPress={() => {
-            laskeEtaisyys();
+            etsiLahinAutomaatti();
           }}
       />
 
-      {(automaatit != "")
-
-      ?<Text>{JSON.stringify(automaatit)}</Text>
+      {(lahinAutomaatti != null)
+      ? automaatit.map((automaatti, idx) => {
+        if(automaatti.etaisyys === lahinAutomaatti){
+          return(
+            <Card
+            key={idx}
+            >
+              <Card.Content>
+                <Paragraph style={styles.kortti}>Lähin automaatti sijaitsee {lahinAutomaatti} km päässä!</Paragraph>
+                <Title>Osoite:</Title>
+                <Paragraph>{automaatti.katuosoite}</Paragraph>
+                <Paragraph>0{automaatti.postinumero}</Paragraph>
+                <Paragraph>{automaatti.postitoimipaikka}</Paragraph>
+              </Card.Content>
+      
+            </Card>
+            )
+        }
+      })
       : null
       }
 
@@ -121,3 +134,22 @@ export default function Automaattipaikannin() {
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  appbar : {
+    marginTop: 50
+  },
+  kortti : {
+    marginTop: 20,
+    fontSize : 16
+  },
+  icon : {
+    marginLeft : 20,
+    marginBottom : 30,
+    padding : 10,
+    marginTop : 50,
+    margin : 20
+  },
+});
